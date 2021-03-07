@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# Zacharia S. Thottakara
+#
+# Script to create symbolic links for all files in DIR1 for DIR2
+# ARG1 = Folder of files to create symlinks of
+# ARG2 = Folder of files to create symlinks in
+# The Arguments can be either relative or absolute paths
+# The symbolic links created are made with absolute paths
+
+if [ $# -lt 2 ]
+then
+	echo "Too Few Arguments";
+	exit;
+elif [ $# -gt 2 ]
+then
+	echo "Too Many Arguments";
+	exit;
+fi
+
+srcDir="$(if cd "$1/" 2> /dev/null ; then pwd; else echo "false"; fi)/"
+dstDir="$(if cd $2 2> /dev/null ; then pwd; else echo "false"; fi)/"
+
+if [ $srcDir == "false" ]
+then
+	echo "${1%/*} is not a real directory";
+	exit;
+fi
+if [ $dstDir == "false" ]
+then
+	echo "$2 is not a real directory";
+	exit;
+fi
+
+cmd="ln --symbolic"
+echo "Creating Symbolic Links from $srcDir to $dstDir"
+
+for f in $srcDir*
+do
+	cmd="$cmd $f"
+done
+cmd="$cmd $dstDir"
+$($cmd)

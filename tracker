@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# Zacharia S. Thottakara
+#
+# Script to capture event changes in command output.
+# ARG1 = Quoted command to watch. EX: "ls -al /mnt"
+# ARG2 = File to write event changes to.(OPTIONAL) EX: /var/log/mnt_tracker.log
+# ./tracker "ls -al /mnt" /var/log/mnt_tracker.log
+# The above command will track the /mnt directory for changes to ls output and write it to /var/log/mnt_tracker.log
+# This script will take over the current thread so be sure to background/screen/detach the process.
+
+comman=$1
+writeFile=$2
+if [[ $3 != "" ]]
+then
+	echo "Too many arguments"
+	echo "First argument is the command to watch and the second is the file to output to."
+	echo "Place command name and file name in double quotes if there are any spaces needed."
+	echo "Filename is not a required argument"
+	exit
+fi
+
+if [[ $2 != "" ]]
+then
+	echo "The filename isn't needed, but may be provided."
+	echo "Be sure you placed the command in quotes if there are any spaces"
+fi
+
+flag=true
+
+old=`$comman 2>/dev/null`
+ret=$?
+if [[ $ret != 0 ]]
+then
+	echo "Invalid Command to watch"
+	echo "Command terminated with non-zero exit code."
+	echo "Think about placing a wrapper around the command."
+	exit
+fi
+
+echo "Tracking of Command \"$comman\" has begun."
+
+while $flag
+do
+	new=`$comman`
+	sleep 2
+	if [[ $new != $old ]]
+	then
+		date=`date +%m/%d/%y_%H:%M:S`
+		if [[ $writeFile != "" ]]
+		then
+			echo "###### Found Difference at $date ######" >> $writeFile
+			diff -y <(echo "$old") <(echo "$new") >> $writeFile
+			echo "###### END OF DIFF ######" >> $writeFile
+			echo "Setting old to new and continuing execution" $writeFile
+		else
+			echo "###### Found Difference at $date ######"
+			diff -y <(echo "$old") <(echo "$new")
+			echo "###### END OF DIFF ######"
+			echo "Setting old to new and continuing execution"
+		fi
+		old=$new
+	fi
+done

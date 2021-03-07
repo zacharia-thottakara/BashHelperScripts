@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# Zacharia S. Thottakara
+# 
+# Quick Script to show pre-configured command examples
+# ARG1 = Command to show example of
+# This script reqires the creation of an "Examples" directory in the user's home directory
+# The command examples in that directory are simply files of the command name with text examples
+# This is like a custom man page (not interactive)
+
+echo "$HOME"
+exampleDir="$HOME/.Examples/$1"
+cat "$exampleDir"

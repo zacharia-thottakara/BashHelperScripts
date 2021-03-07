@@ -1,0 +1,39 @@
+#!/bin//bash
+#
+# Zacharia S. Thottakara
+#
+# Script to check access to ssh on a host
+# ARG1 = ip/hostname to test
+# ARG2 = port ssh is listening on (OPTIONAL)
+# This script will prompt for a password if a connection is found
+# If passwordless authentication has been setup this script will terminate when ssh access to the host is confirmed
+
+if [[ $1 == "" ]]
+then
+	echo "This script requires at least one argument."
+	echo "Arg1: Required - host to check for ssh connection"
+	echo "Arg2: Optional - port to check for ssh connection"
+	exit
+fi
+if [[ $3 != "" ]]
+then
+	echo "This program defines only 1-2 arguments."
+	echo "Please run without arguments for full help."
+fi
+
+if [[ $2 != "" ]]
+then
+	port=$2
+else
+	port=22
+fi
+
+terminator=255
+while [ "$terminator" != 0 ]
+do
+	ssh -q $1 -p $2 exit
+	terminator=$?
+	echo "$terminator"
+	sleep 5
+done
+echo "SSH connection found to $1 on $2 at `date +%s`"

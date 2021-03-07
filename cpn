@@ -1,0 +1,37 @@
+#!/bin/bash
+# 
+# Zacharia S. Thottakara
+#
+# Script to copy the newest file of DIR1 into DIR2
+# ARG1 = Folder to find newest file of
+# ARG2 = Folder to copy file to
+# Arguements can be either relative or absolute paths
+
+if [ $# -lt 2 ]
+then
+	echo "Too Few Arguments";
+	exit;
+elif [ $# -gt 2 ]
+then
+	echo "Too Many Arguments";
+	exit;
+fi
+
+srcDir="$(if cd "${1%/*}/" 2> /dev/null ; then pwd; else echo "false"; fi)/"
+fileMatch=${1##*/}
+dstDir="$(if cd ${2%/*} 2> /dev/null ; then pwd; else echo "false"; fi)/"
+fileOut=${2##*/}
+
+if [ $srcDir == "false" ]
+then
+	echo "${1%/*} is not a real directory";
+	exit;
+fi
+if [ $dstDir == "false" ]
+then
+	echo "$2 is not a real directory";
+	exit;
+fi
+
+newest=`ls -t $srcDir$fileMatch | head -1`
+cp $newest $dstDir$fileOut
